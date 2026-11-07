@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Gandalf Connect</title>
+<style>
+  :root { --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --box: #f6f8fa; --line: #d1d9e0; --accent: #0969da; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --box: #151b23; --line: #3d444d; --accent: #4493f8; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width: 640px; margin: 48px auto; padding: 0 16px; }
+  h1 { font-size: 22px; margin: 0 0 12px; }
+  p { color: var(--muted); }
+  code { display: block; background: var(--box); border: 1px solid var(--line); border-radius: 6px; padding: 12px; font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; white-space: pre-wrap; color: var(--fg); }
+  button { margin-top: 12px; font: inherit; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Connect Slack to Gandalf</h1>
+  <div id="ok" class="hidden">
+    <p>Copy this line. Paste it in your DM with Gandalf within 10 minutes. It works once.</p>
+    <code id="line"></code>
+    <button id="copy" type="button">Copy</button>
+  </div>
+  <p id="bad" class="hidden">Slack did not send a code. Ask Gandalf for a new link with "connect slack".</p>
+  <p>This page sends nothing anywhere. Only Gandalf can use the code.</p>
+</main>
+<script>
+(function () {
+  var q = new URLSearchParams(window.location.search);
+  var code = q.get("code") || "";
+  var state = q.get("state") || "";
+  // Keep the code out of browser history.
+  try { history.replaceState(null, "", window.location.pathname); } catch (e) {}
+  if (/^[A-Za-z0-9.]{10,200}$/.test(code) && /^[A-Za-z0-9._-]{10,400}$/.test(state)) {
+    var line = "connect slack code=" + code + " state=" + state;
+    document.getElementById("line").textContent = line;
+    document.getElementById("ok").classList.remove("hidden");
+    document.getElementById("copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(line).then(function () {
+        document.getElementById("copy").textContent = "Copied";
+      });
+    });
+  } else {
+    document.getElementById("bad").classList.remove("hidden");
+  }
+})();
+</script>
+</body>
+</html>
